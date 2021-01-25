@@ -1,4 +1,5 @@
 const http = require('http');
+const Hero = require('./entities/hero');
 
 const HeroFactory = require('./factories/heroFactory');
 
@@ -16,6 +17,31 @@ const routes = {
         response.write(JSON.stringify({ results: heroes }));
 
         response.end();
+    },
+    '/heroes:post': async (request, response) => {
+        // async iterator
+        for await (const data of request) {
+            const item = JSON.parse(data);
+
+            const hero = new Hero(item);
+
+            const { error, valid } = hero.isValid();
+
+            if (!valid) {
+                response.writeHead(400, DEFAULT_HEADER);
+                response.write(JSON.stringify({ error: error.join(',') }));
+                return response.end();
+            }
+
+            const id = await heroService.create(hero);
+
+            response.writeHead(201, DEFAULT_HEADER);
+            response.write(
+                JSON.stringify({ success: 'Hero successfully created!', id }),
+            );
+
+            response.end();
+        }
     },
     default: (request, response) => {
         response.write('Hello!');
