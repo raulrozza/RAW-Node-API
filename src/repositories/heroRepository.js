@@ -1,4 +1,4 @@
-const { readFile, writeFile } = require('fs/promises');
+const { promises } = require('fs');
 
 class HeroRepository {
     constructor({ file }) {
@@ -6,7 +6,7 @@ class HeroRepository {
     }
 
     async _currentFileContent() {
-        return JSON.parse(await readFile(this.file));
+        return JSON.parse(await promises.readFile(this.file));
     }
 
     async find(itemId) {
@@ -21,7 +21,7 @@ class HeroRepository {
         const currentFile = await this._currentFileContent();
         currentFile.push(data);
 
-        await writeFile(this.file, JSON.stringify(currentFile));
+        await promises.writeFile(this.file, JSON.stringify(currentFile));
 
         return data.id;
     }
